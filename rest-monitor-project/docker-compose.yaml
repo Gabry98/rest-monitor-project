@@ -1,0 +1,44 @@
+version: '3.1'
+
+services:
+  rest-monitor:
+    image: rest/rest-monitor:1.0.0-SNAPSHOT
+    container_name: rest-monitor
+    depends_on:
+      - postgres-db
+    ports:
+      - "8081:8081"
+    networks:
+      - rest-net
+    volumes:
+       - ./file:/file_directory
+
+  postgres-db:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: project-db
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - rest-net
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - rest-net
+
+networks:
+  rest-net:
+    driver: bridge
